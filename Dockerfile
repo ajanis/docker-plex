@@ -1,4 +1,4 @@
-FROM lsiobase/xenial
+FROM lsiobase/bionic
 MAINTAINER Alan Janis
 
 
