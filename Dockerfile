@@ -1,4 +1,4 @@
-FROM lsiobase/bionic
+FROM lsiobase/ubuntu:bionic
 MAINTAINER Alan Janis
 
 
