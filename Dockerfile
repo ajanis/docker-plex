@@ -1,7 +1,6 @@
-FROM lsiobase/ubuntu:bionic
+FROM lsiobase/xenial
+MAINTAINER Alan Janis
 
-#Add needed nvidia environment variables for https://github.com/NVIDIA/nvidia-docker
-ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility"
 
 # global environment settings
 ENV DEBIAN_FRONTEND="noninteractive" \
@@ -9,38 +8,31 @@ PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new" \
 PLEX_INSTALL="https://plex.tv/downloads/latest/1?channel=8&build=linux-ubuntu-x86_64&distro=ubuntu" \
 PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support" \
 PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
+PLEX_MEDIA_SERVER_INFO_DEVICE=docker \
 PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
-PLEX_MEDIA_SERVER_USER="abc" \
-PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
-PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container (LinuxServer.io)"
+PLEX_MEDIA_SERVER_USER=abc
 
+# install packages
 RUN \
- echo "**** install runtime packages ****" && \
  apt-get update && \
  apt-get install -y \
-    libva2 \
-    libva-drm2 \
-	udev \
+	avahi-daemon \
+	dbus \
 	unrar \
-	wget \
-  jq && \
- echo "**** Udevadm hack ****" && \
- mv /sbin/udevadm /sbin/udevadm.bak && \
- echo "exit 0" > /sbin/udevadm && \
- chmod +x /sbin/udevadm && \
- echo "**** install plex ****" && \
- if [ -z ${PLEX_RELEASE+x} ]; then \
- 	PLEX_RELEASE=$(curl -s 'https://plex.tv/downloads/details/1?build=linux-ubuntu-x86_64&distro=ubuntu' \
-	|grep -oP 'version="\K[^"]+' | tail -n 1); \
- fi && \
+	libva2 \
+	libva-drm2 \
+	wget && \
+
+# install plex
  curl -o \
 	/tmp/plexmediaserver.deb -L \
-	"${PLEX_DOWNLOAD}/${PLEX_RELEASE}/debian/plexmediaserver_${PLEX_RELEASE}_amd64.deb" && \
+	"${PLEX_INSTALL}" && \
  dpkg -i /tmp/plexmediaserver.deb && \
- mv /sbin/udevadm.bak /sbin/udevadm && \
- echo "**** ensure abc user's home folder is /app ****" && \
+
+# change abc home folder to fix plex hanging at runtime with usermod
  usermod -d /app abc && \
- echo "**** cleanup ****" && \
+
+# cleanup
  apt-get clean && \
  rm -rf \
 	/etc/default/plexmediaserver \
@@ -51,6 +43,6 @@ RUN \
 # add local files
 COPY root/ /
 
-# ports and volumes
+# ports and volumes
 EXPOSE 32400 32400/udp 32469 32469/udp 5353/udp 1900/udp
 VOLUME /config /transcode
