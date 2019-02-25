@@ -27,16 +27,13 @@ RUN \
 	libva-drm2 \
 	jq \
 	wget && \
-
 # install plex
  curl -o \
 	/tmp/plexmediaserver.deb -L \
 	"${PLEX_INSTALL}" && \
  dpkg -i /tmp/plexmediaserver.deb && \
-
 # change abc home folder to fix plex hanging at runtime with usermod
  usermod -d /app abc && \
-
 # cleanup
  apt-get clean && \
  rm -rf \
