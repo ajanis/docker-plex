@@ -12,7 +12,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility"
 
 # global environment settings
 ENV DEBIAN_FRONTEND="noninteractive" \
-PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server" \
+PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new" \
 PLEX_INSTALL="https://plex.tv/downloads/latest/1?channel=8&build=linux-ubuntu-x86_64&distro=ubuntu" \
 PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support" \
 PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
@@ -25,6 +25,8 @@ RUN \
  echo "**** install runtime packages ****" && \
  apt-get update && \
  apt-get install -y \
+    libva2 \
+    libva-drm2 \
 	udev \
 	unrar \
 	wget \
@@ -40,7 +42,7 @@ RUN \
  fi && \
  curl -o \
 	/tmp/plexmediaserver.deb -L \
-	"https://downloads.plex.tv/plex-media-server/${PLEX_RELEASE}/plexmediaserver_${PLEX_RELEASE}_amd64.deb" && \
+	"${PLEX_DOWNLOAD}/${PLEX_RELEASE}/debian/plexmediaserver_${PLEX_RELEASE}_amd64.deb" && \
  dpkg -i /tmp/plexmediaserver.deb && \
  mv /sbin/udevadm.bak /sbin/udevadm && \
  echo "**** ensure abc user's home folder is /app ****" && \
