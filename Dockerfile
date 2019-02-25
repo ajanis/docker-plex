@@ -1,10 +1,13 @@
 FROM lsiobase/ubuntu:bionic
 MAINTAINER Alan Janis
 
+#Add needed nvidia environment variables for https://github.com/NVIDIA/nvidia-docker
+ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility"
 
 # global environment settings
 ENV DEBIAN_FRONTEND="noninteractive" \
-PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new" \
+PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server" \
+PLEX_DOWNLOAD_NEW="https://downloads.plex.tv/plex-media-server-new" \
 PLEX_INSTALL="https://plex.tv/downloads/latest/1?channel=8&build=linux-ubuntu-x86_64&distro=ubuntu" \
 PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support" \
 PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
@@ -16,11 +19,13 @@ PLEX_MEDIA_SERVER_USER=abc
 RUN \
  apt-get update && \
  apt-get install -y \
+    udev \
 	avahi-daemon \
 	dbus \
 	unrar \
 	libva2 \
 	libva-drm2 \
+	jq \
 	wget && \
 
 # install plex
